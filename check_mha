@@ -1,0 +1,94 @@
+#!/bin/bash
+# Nagios Plugin to check MHA status across multiple instances
+# © 2013 Jamie L Sammons
+
+printhelp () {
+  echo ""
+  echo "Usage"
+  echo " "`basename $0`" [-a List of MHA applications for Nagios to monitor (separated by space)]"
+  echo "  -a  -- Supply a list of MHA applications for Nagios to monitor (For example: ehub1 ehub2 wsg1)"
+}
+
+output () {
+  # Got no data => UNKNOWN
+  if [ "$critical" == "" ] && [ "$critfailover" == "" ] && [ "$running" == "" ] && [ "$runfailover" == "" ]
+  then
+    echo "${bold}[UNKNOWN] - Service MHA is in unknown status"
+    exit 4
+  fi
+
+  # Return Information
+  if [ "$info" ]
+  then
+    echo $info
+  elif [ "$critical" -a "$critfailover" ]
+  then
+    echo -en "[CRITICAL] - Service MHA not running for: $critical [FAILOVER] - Service MHA not running for: $critfailover"
+  elif [ "$critical" ]
+  then
+    echo -en "[CRITICAL] - Service MHA not running for: $critical"
+  elif [ "$critfailover" ]
+  then
+    echo -en "[FAILOVER] - Service MHA not running for: $critfailover"
+  fi
+  if [ "$running" -a "$runfailover" ]
+  then
+    echo -en "[OK] - Service MHA running for: $running [FAILOVER] - Service MHA running for: $runfailover"
+  elif [ "$runfailover" ]
+  then
+    echo -en "[FAILOVER] - Service MHA running for: $runfailover"
+  elif [ "$running" ]
+  then
+    echo -en "[OK] - Service MHA running for: $running"
+  fi
+  exit $retval
+}
+
+check_mha() {
+  for mha_application in $mha_applications
+  do
+    if [[ -f /var/log/masterha/$mha_application/$mha_application.master_status.health && -f /var/log/masterha/$mha_application/$mha_application.failover.complete ]]; 
+	then runfailover="$runfailover$mha_application "
+	if [ $retval -ne 2 ];
+	    then retval=1
+	fi
+    elif [ -f /var/log/masterha/$mha_application/$mha_application.master_status.health ]
+	then running="$running$mha_application "	
+    else
+        if [ -f /var/log/masterha/$mha_application/$mha_application.failover.complete ]
+             then critfailover="$critfailover$mha_application "
+             retval=2
+	else
+	     critical="$critical$mha_application "
+	     retval=2
+        fi
+    fi
+  done
+}
+
+checkconfig () {
+  if [ "$#" -eq 0 -o "$1" == "-h" -o "$1" == "--help" ]
+  then
+    printhelp
+    exit 0
+  fi
+
+  if [ "$1" == "-a" ]
+  then
+    shift
+    while [ `echo $1 | grep -v ^-` ]
+    do
+      mha_applications="$mha_applications $1"
+      shift
+    done
+  else
+    echo "ERROR: "`basename $0`" does not support '$1'. Type '"`basename $0`" --help' for additional information."
+    printhelp
+    exit 1
+  fi
+}
+
+retval=0
+checkconfig "$@"
+check_mha "$FILES"
+output
