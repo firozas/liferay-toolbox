@@ -1,2 +1,4 @@
-/classes
-/ext-util-bridges.jar
+# Ignore everything in this directory
+*
+# Except this file
+!.gitignore

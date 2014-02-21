@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.upgrade.v6_2_0.UpgradeSocial;
 import com.liferay.portlet.social.model.SocialActivity;
 import com.liferay.portlet.social.service.SocialActivityLocalServiceUtil;
-import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -46,6 +45,17 @@ public class CustomUpgradeSocial extends UpgradeSocial {
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
+		
+		boolean isCreateDateUnique = false;
+		long updatedCreateDate = createDate.getTime();
+		
+		isCreateDateUnique = checkCreateDate(updatedCreateDate, classNameId, classPK);
+		
+		while (!isCreateDateUnique)
+		{
+			updatedCreateDate += 1;
+			isCreateDateUnique = checkCreateDate(updatedCreateDate, classNameId, classPK);
+		}
 
 		try {
 			con = DataAccess.getUpgradeOptimizedConnection();
@@ -64,7 +74,7 @@ public class CustomUpgradeSocial extends UpgradeSocial {
 			ps.setLong(2, groupId);
 			ps.setLong(3, companyId);
 			ps.setLong(4, userId);
-			ps.setLong(5, createDate.getTime());
+			ps.setLong(5, updatedCreateDate);
 			ps.setLong(6, mirrorActivityId);
 			ps.setLong(7, classNameId);
 			ps.setLong(8, classPK);
@@ -72,20 +82,6 @@ public class CustomUpgradeSocial extends UpgradeSocial {
 			ps.setString(10, extraData);
 			ps.setLong(11, receiverUserId);
 
-			ps.executeUpdate();
-		}
-		catch (MySQLIntegrityConstraintViolationException micve) {
-			
-			long updatedCreateDate = createDate.getTime();	
-			boolean isCreateDateUnique = false;
-			
-			do {
-				updatedCreateDate += 1;
-				isCreateDateUnique = checkCreateDate(updatedCreateDate, classNameId, classPK);
-			     
-			} while (!isCreateDateUnique);
-				
-			ps.setLong(5, updatedCreateDate);
 			ps.executeUpdate();
 		}
 		catch (Exception e) {
