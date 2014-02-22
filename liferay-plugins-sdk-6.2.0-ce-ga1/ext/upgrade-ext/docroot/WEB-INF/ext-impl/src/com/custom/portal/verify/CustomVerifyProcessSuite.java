@@ -24,7 +24,6 @@ public class CustomVerifyProcessSuite extends VerifyProcessSuite {
 	@Override
 	protected void doVerify() throws Exception {
 		
-		/**
 		verify(new VerifyProperties());
 
 		verify(new VerifyDB2());
@@ -42,10 +41,8 @@ public class CustomVerifyProcessSuite extends VerifyProcessSuite {
 		verify(new VerifyAuditedModel());
 		verify(new VerifyBlogs());
 		verify(new VerifyBookmarks());
-		**/
 		verify(new CustomVerifyDocumentLibrary());
 		verify(new CustomVerifyDynamicDataMapping());
-		/**
 		verify(new VerifyGroupId());
 		verify(new VerifyJournal());
 		verify(new VerifyLayout());
@@ -55,7 +52,6 @@ public class CustomVerifyProcessSuite extends VerifyProcessSuite {
 		verify(new VerifyUser());
 		verify(new VerifyWiki());
 		verify(new VerifyWorkflow());
-		**/
 
 		// VerifyBlogsTrackbacks looks at every blog comment to see if it is a
 		// trackback and verifies that the source URL is a valid URL.

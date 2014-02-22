@@ -27,7 +27,6 @@ public class CustomUpgradeProcess_6_2_0 extends UpgradeProcess_6_2_0 {
 	@Override
 	protected void doUpgrade() throws Exception {
 		upgrade(UpgradeSchema.class);
-		/**
 		upgrade(UpgradeAnnouncements.class);
 		upgrade(UpgradeAssetPublisher.class);
 		upgrade(UpgradeBlogs.class);
@@ -35,11 +34,9 @@ public class CustomUpgradeProcess_6_2_0 extends UpgradeProcess_6_2_0 {
 		upgrade(UpgradeCalendar.class);
 		upgrade(UpgradeCompany.class);
 		upgrade(UpgradeCustomizablePortlets.class);
-		**/
 		upgrade(UpgradeDocumentLibrary.class);
 		upgrade(UpgradeDynamicDataListDisplay.class);
 		upgrade(UpgradeDynamicDataMapping.class);
-		/**
 		upgrade(UpgradeGroup.class);
 		upgrade(UpgradeImageGallery.class);
 		upgrade(UpgradeJournal.class);
@@ -54,13 +51,10 @@ public class CustomUpgradeProcess_6_2_0 extends UpgradeProcess_6_2_0 {
 		upgrade(UpgradePortletPreferences.class);
 		upgrade(UpgradeRepository.class);
 		upgrade(UpgradeSearch.class);
-		**/
 		upgrade(CustomUpgradeSocial.class);
-		/**
 		upgrade(UpgradeUser.class);
 		upgrade(UpgradeWiki.class);
 		upgrade(UpgradeWikiAttachments.class);
-		**/
 	}
 
 }
